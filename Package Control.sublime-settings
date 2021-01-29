@@ -1,16 +1,26 @@
 {
-  "installed_packages":
-  [
-    "AdvancedNewFile",
-    "All Autocomplete",
-    "Babel",
-    "Emmet",
-    "ERB Snippets",
-    "Git",
-    "GitGutter",
-    "Package Control",
-    "SCSS",
-    "SublimeLinter",
-    "SublimeLinter-rubocop"
-  ]
+	"bootstrapped": true,
+	"in_process_packages":
+	[
+	],
+	"installed_packages":
+	[
+		"AdvancedNewFile",
+		"All Autocomplete",
+		"Babel",
+		"Browser Integration",
+		"Browser Sync",
+		"Emmet",
+		"ERB Snippets",
+		"Git",
+		"GitGutter",
+		"LiveReload",
+		"Open In Browser",
+		"Package Control",
+		"SCSS",
+		"SublimeLinter",
+		"SublimeLinter-rubocop",
+		"Tagify",
+		"TAGML"
+	]
 }

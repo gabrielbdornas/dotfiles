@@ -2,6 +2,16 @@
 alias ip="curl ipinfo.io/ip"
 alias ips="ifconfig -a | perl -nle'/(\d+\.\d+\.\d+\.\d+)/ && print $1'"
 alias speedtest="wget -O /dev/null http://speedtest.wdc01.softlayer.com/downloads/test10.zip"
+alias codei="~/code/gabrielbdornas/codei-web-site"
+alias blomia="~/code/gabrielbdornas/blomia"
+alias codei="~/code/gabrielbdornas/codei-web-site"
+alias gc="git add . && git commit -m $1"
+alias pdi="cd ~/code/gabrielbdornas/pentaho/data-integration_7.0 && sudo ./spoon.sh"
+alias mondrian="cd ~/code/gabrielbdornas/pentaho/schema-workbench && sudo ./workbench.sh"
+alias pgadmin="cd ~/pgAdmin4/pgAdmin4 && python lib/python3.8/site-packages/pgadmin4/pgAdmin4.py"
+alias sqlpa="cd ~/sql_power_architect && sudo java -Xms512m -Xmx1024m -jar architect.jar"
+alias vpn="cd ~/Documents/MgVpnCVD19-07-UDP4-1196-User-MG && sudo openvpn MgVpnCVD19-07-UDP4-1196-User-MG.ovpn"
 
 # Quickly serve the current directory as HTTP
 alias serve='ruby -run -e httpd . -p 8000'  # Or python -m SimpleHTTPServer :)
+
