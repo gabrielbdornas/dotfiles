@@ -70,3 +70,13 @@ export EDITOR=code
 
 # Set ipdb as the default Python debugger
 export PYTHONBREAKPOINT=ipdb.set_trace
+
+
+
+
+
+
+# My own zshrc commands
+mkfile() { mkdir -p "$(dirname "$1")" && touch "$1" ;  }
+# https://docs.gitignore.io/install/command-line#linux-zsh
+gi() { curl -sLw "\n" https://www.toptal.com/developers/gitignore/api/$@ ;}
