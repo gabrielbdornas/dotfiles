@@ -4,7 +4,7 @@ ZSH=$HOME/.oh-my-zsh
 ZSH_THEME="robbyrussell"
 
 # Useful oh-my-zsh plugins for Le Wagon bootcamps
-plugins=(git gitfast last-working-dir common-aliases zsh-syntax-highlighting history-substring-search ssh-agent)
+plugins=(git gitfast last-working-dir common-aliases zsh-syntax-highlighting history-substring-search ssh-agent poetry)
 
 # (macOS-only) Prevent Homebrew from reporting - https://github.com/Homebrew/brew/blob/master/docs/Analytics.md
 export HOMEBREW_NO_ANALYTICS=1
@@ -82,3 +82,5 @@ export NGROK=evident-repeatedly-troll.ngrok-free.app
 mkfile() { mkdir -p "$(dirname "$1")" && touch "$1" ;  }
 # https://docs.gitignore.io/install/command-line#linux-zsh
 gi() { curl -sLw "\n" https://www.toptal.com/developers/gitignore/api/$@ ;}
+# Python c
+pyc() { python3 -c "print($1)"  }

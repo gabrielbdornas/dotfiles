@@ -87,4 +87,9 @@
     "workbench.colorTheme": "Visual Studio Dark",
     "extensions.ignoreRecommendations": true,
     "security.workspace.trust.untrustedFiles": "open",
+    "[css]": {
+      "editor.defaultFormatter": "aeschli.vscode-css-formatter"
+    },
+    "explorer.confirmDragAndDrop": false,
+    "makefile.configureOnOpen": true,
 }
