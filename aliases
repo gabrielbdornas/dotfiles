@@ -14,7 +14,18 @@ alias stt="echo 'Launching VS Code instead of Sublime Text... (cf ~/.aliases)' &
 
 # My own aliases
 alias venv="echo 'Creating python virtual venv...' && python3 -m venv venv"
-alias activate="echo 'Activating python virtual venv...' && source venv/bin/activate"
+alias activate='
+  if [ -d "venv" ]; then
+    ENV_DIR="venv"
+  elif [ -d ".venv" ]; then
+    ENV_DIR=".venv"
+  else
+    echo "No virtual environment found."
+    return 1
+  fi
+  echo "Activating Python virtual environment: $ENV_DIR..."
+  source "$ENV_DIR/bin/activate"
+'
 alias install="echo 'Instaling python packages...' && pip install -r requirements.txt"
 alias vpn="cd /home/gabrielbdornas/vpnserver-UDP4-1237-User-1237/ && sudo openvpn vpnserver-UDP4-1237-User-1237.ovpn"
 alias gitignore="gi emacs,python,vs,sublimetext >> .gitignore"
