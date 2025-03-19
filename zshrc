@@ -85,3 +85,21 @@ mkfile() { mkdir -p "$(dirname "$1")" && touch "$1" ;  }
 gi() { curl -sLw "\n" https://www.toptal.com/developers/gitignore/api/$@ ;}
 # Python c
 pyc() { python3 -c "print($1)"  }
+# track issue timelapse
+start() {
+    if [ -z "$1" ]; then
+        echo "Usage: start <issue_number>"
+        return 1
+    fi
+    git commit --allow-empty -m "$1-start" -m "See #$1"
+    echo "Started tracking Issue #$1"
+}
+
+stop() {
+    if [ -z "$1" ]; then
+        echo "Usage: stop <issue_number>"
+        return 1
+    fi
+    git commit --allow-empty -m "$1-stop" -m "See #$1"
+    echo "Stopped tracking Issue #$1"
+}
