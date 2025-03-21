@@ -78,6 +78,9 @@ export NGROK=evident-repeatedly-troll.ngrok-free.app
 
 # Set up fzf key bindings and fuzzy completion
 source <(fzf --zsh)
+# Poetry tab completation configuration
+fpath+=~/.zfunc
+autoload -Uz compinit && compinit
 
 # My own zshrc commands
 mkfile() { mkdir -p "$(dirname "$1")" && touch "$1" ;  }
@@ -85,6 +88,13 @@ mkfile() { mkdir -p "$(dirname "$1")" && touch "$1" ;  }
 gi() { curl -sLw "\n" https://www.toptal.com/developers/gitignore/api/$@ ;}
 # Python c
 pyc() { python3 -c "print($1)"  }
+
+# start postgres
+sudo /etc/init.d/postgresql start
+
+# Created by `pipx` on 2025-01-23 17:38:47
+export PATH="$PATH:/home/gabrielbdornas/.local/bin"
+
 # track issue timelapse
 start() {
     if [ -z "$1" ]; then
