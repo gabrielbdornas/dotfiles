@@ -76,8 +76,8 @@ export PYTHONBREAKPOINT=ipdb.set_trace
 
 export NGROK=evident-repeatedly-troll.ngrok-free.app
 
-
-
+# Set up fzf key bindings and fuzzy completion
+source <(fzf --zsh)
 
 # My own zshrc commands
 mkfile() { mkdir -p "$(dirname "$1")" && touch "$1" ;  }
@@ -103,3 +103,5 @@ stop() {
     git commit --allow-empty -m "$1-stop" -m "See #$1"
     echo "Stopped tracking Issue #$1"
 }
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
