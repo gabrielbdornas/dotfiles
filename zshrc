@@ -76,8 +76,6 @@ export PYTHONBREAKPOINT=ipdb.set_trace
 
 export NGROK=evident-repeatedly-troll.ngrok-free.app
 
-# Set up fzf key bindings and fuzzy completion
-source <(fzf --zsh)
 # Poetry tab completation configuration
 fpath+=~/.zfunc
 autoload -Uz compinit && compinit
@@ -114,4 +112,4 @@ stop() {
     echo "Stopped tracking Issue #$1"
 }
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+  [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
