@@ -87,8 +87,11 @@ gi() { curl -sLw "\n" https://www.toptal.com/developers/gitignore/api/$@ ;}
 # Python c
 pyc() { python3 -c "print($1)"  }
 
-# start postgres
-sudo /etc/init.d/postgresql start
+# Inside WSL, start PostgreSQL manually
+if grep -qi microsoft /proc/sys/kernel/osrelease; then
+    # Inside WSL, start PostgreSQL manually
+    sudo /etc/init.d/postgresql start
+fi
 
 # Created by `pipx` on 2025-01-23 17:38:47
 export PATH="$PATH:/home/gabrielbdornas/.local/bin"
