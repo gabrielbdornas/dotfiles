@@ -128,3 +128,7 @@ cdh() {
 cda() {
     cd "$(fdfind --type d --hidden "$1" / | fzf)"
 }
+
+cursor() {
+    nohup /opt/cursor.AppImage "$@" > /dev/null 2>&1 &!
+}
