@@ -116,3 +116,15 @@ stop() {
 }
 
   [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# fzf search
+# See https://chatgpt.com/share/67defe4a-20e4-8003-b854-d66745edd913
+export FD_OPTIONS="--ignore-file=$HOME/.ignore"
+
+cdh() {
+    cd "$(fdfind --type d --hidden "$1" ~ | fzf)"
+}
+
+cda() {
+    cd "$(fdfind --type d --hidden "$1" / | fzf)"
+}
