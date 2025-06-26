@@ -129,6 +129,94 @@ cda() {
     cd "$(fdfind --type d --hidden "$1" / | fzf)"
 }
 
+# Cursor update function
+cursor-update() {
+    # Check if we're in WSL - if so, don't update here
+    if grep -qEi "(microsoft|wsl)" /proc/version &> /dev/null; then
+        echo "⚠️  You're in WSL. Cursor updates should be done on the host Linux system."
+        echo "💡 Please run 'cursor-update' on your native Linux machine instead."
+        return 1
+    fi
+    
+    echo "🔄 Updating Cursor..."
+    
+    # Create /opt directory if it doesn't exist
+    sudo mkdir -p /opt
+    
+    # Get the latest version from Cursor's GitHub releases
+    echo "📥 Fetching latest Cursor version..."
+    LATEST_VERSION=$(curl -s https://api.github.com/repos/getcursor/cursor/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    
+    if [ -z "$LATEST_VERSION" ]; then
+        echo "❌ Failed to fetch latest version"
+        return 1
+    fi
+    
+    echo "📦 Latest version: $LATEST_VERSION"
+    
+    # Check if we already have this version
+    if [ -f "/opt/cursor-$LATEST_VERSION.AppImage" ]; then
+        echo "✅ Already have version $LATEST_VERSION"
+        echo "🔄 Updating symlink..."
+        sudo ln -sf "/opt/cursor-$LATEST_VERSION.AppImage" "/opt/cursor.AppImage"
+        echo "✅ Cursor updated to version $LATEST_VERSION"
+        return 0
+    fi
+    
+    # Download the latest version
+    DOWNLOAD_URL="https://github.com/getcursor/cursor/releases/download/$LATEST_VERSION/cursor-$LATEST_VERSION.AppImage"
+    echo "📥 Downloading from: $DOWNLOAD_URL"
+    
+    # Download with progress
+    if curl -L -o "/tmp/cursor-$LATEST_VERSION.AppImage" "$DOWNLOAD_URL"; then
+        echo "✅ Download completed"
+        
+        # Move to /opt and make executable
+        sudo mv "/tmp/cursor-$LATEST_VERSION.AppImage" "/opt/cursor-$LATEST_VERSION.AppImage"
+        sudo chmod +x "/opt/cursor-$LATEST_VERSION.AppImage"
+        
+        # Create/update symlink
+        sudo ln -sf "/opt/cursor-$LATEST_VERSION.AppImage" "/opt/cursor.AppImage"
+        
+        echo "✅ Cursor updated to version $LATEST_VERSION"
+        echo "📁 Installed at: /opt/cursor-$LATEST_VERSION.AppImage"
+        echo "🔗 Symlink: /opt/cursor.AppImage -> /opt/cursor-$LATEST_VERSION.AppImage"
+        
+        # Clean up old versions (keep last 3)
+        echo "🧹 Cleaning up old versions..."
+        ls -t /opt/cursor-*.AppImage 2>/dev/null | tail -n +4 | xargs -r sudo rm -f
+        
+    else
+        echo "❌ Download failed"
+        return 1
+    fi
+}
+
+# Show current cursor version
+cursor-version() {
+    # Check if we're in WSL - if so, show WSL-specific info
+    if grep -qEi "(microsoft|wsl)" /proc/version &> /dev/null; then
+        echo "🖥️  You're in WSL"
+        echo "📋 Cursor runs from Windows: /mnt/c/Users/m7522667/AppData/Local/Programs/Cursor/Cursor.exe"
+        echo "💡 To check Cursor version on Linux, run 'cursor-version' on your native Linux machine"
+        return 0
+    fi
+    
+    if [ -L "/opt/cursor.AppImage" ]; then
+        CURRENT_VERSION=$(readlink "/opt/cursor.AppImage" | sed 's/.*cursor-\(.*\)\.AppImage/\1/')
+        echo "📋 Current Cursor version: $CURRENT_VERSION"
+        echo "🔗 Symlink: /opt/cursor.AppImage -> /opt/cursor-$CURRENT_VERSION.AppImage"
+    elif [ -f "/opt/cursor.AppImage" ]; then
+        echo "📋 Found cursor.AppImage but no version info (legacy installation)"
+    else
+        echo "❌ No Cursor installation found in /opt/"
+    fi
+    
+    # List all installed versions
+    echo "📦 Installed versions:"
+    ls -la /opt/cursor-*.AppImage 2>/dev/null || echo "  No versioned installations found"
+}
+
 cursor() {
   if grep -qEi "(microsoft|wsl)" /proc/version &> /dev/null; then
     /mnt/c/Users/m7522667/AppData/Local/Programs/Cursor/Cursor.exe --remote "wsl+Ubuntu" "$PWD" &> /dev/null &!
