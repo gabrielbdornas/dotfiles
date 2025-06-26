@@ -130,5 +130,9 @@ cda() {
 }
 
 cursor() {
+  if grep -qEi "(microsoft|wsl)" /proc/version &> /dev/null; then
+    /mnt/c/Users/m7522667/AppData/Local/Programs/Cursor/Cursor.exe --remote "wsl+Ubuntu" "$PWD" &> /dev/null &!
+  else
     nohup /opt/cursor.AppImage "$@" > /dev/null 2>&1 &!
+  fi
 }
