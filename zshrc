@@ -221,3 +221,7 @@ cursor() {
     nohup /opt/Cursor-1.2.2-x86_64.AppImage "$@" > /dev/null 2>&1 &!
   fi
 }
+
+# Created by `pipx` on 2025-10-06 20:16:48
+export PATH="$PATH:/home/m7522667@ca.intra/.local/bin"
+function gi() { curl -sLw "\n" https://www.toptal.com/developers/gitignore/api/$@ ;}
