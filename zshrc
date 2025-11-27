@@ -221,3 +221,4 @@ cursor() {
     nohup /opt/Cursor-1.2.2-x86_64.AppImage "$@" > /dev/null 2>&1 &!
   fi
 }
+export PATH="/home/gabrielbdornas/.pixi/bin:$PATH"
