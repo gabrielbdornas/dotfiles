@@ -30,3 +30,4 @@ alias install="echo 'Instaling python packages...' && pip install -r requirement
 alias vpn="cd /home/gabrielbdornas/vpnserver-UDP4-1237-User-1237/ && sudo openvpn vpnserver-UDP4-1237-User-1237.ovpn"
 alias gitignore="gi emacs,python,vs,sublimetext >> .gitignore"
 alias fzfile='code $(fzf -m --preview="bat --color=always {}")'
+alias ghb='url=$(gh browse --no-browser); nohup xdg-open "$url" >/dev/null 2>&1 &'
