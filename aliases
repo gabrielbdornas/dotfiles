@@ -31,3 +31,11 @@ alias vpn="cd /home/gabrielbdornas/vpnserver-UDP4-1237-User-1237/ && sudo openvp
 alias gitignore="gi emacs,python,vs,sublimetext >> .gitignore"
 alias fzfile='code $(fzf -m --preview="bat --color=always {}")'
 alias ghb='url=$(gh browse --no-browser); nohup xdg-open "$url" >/dev/null 2>&1 &'
+# Helper function to get the repository name part
+get_repo_name() {
+  echo "${PWD#${PWD%/*/*}/}"
+}
+alias repo='get_repo_name'
+alias create_repo='gh repo create "$(get_repo_name)" --push --remote=origin --source=.'
+alias public_repo='gh repo create "$(get_repo_name)" --public --push --remote=origin --source=.'
+alias private_repo='gh repo create "$(get_repo_name)" --private --push --remote=origin --source=.'
