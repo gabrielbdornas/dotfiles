@@ -22,7 +22,7 @@
         "erb": "html"
     },
     "emmet.showSuggestionsAsSnippets": true,
-    "emmet.triggerExpansionOnTab": true,
+    // "emmet.triggerExpansionOnTab": true,
     "explorer.confirmDelete": false,
     "files.exclude": {
         "__pycache__": true,
@@ -105,5 +105,7 @@
       "*.db3": "${capture}.${extname}-*",
       "*.sdb": "${capture}.${extname}-*",
       "*.s3db": "${capture}.${extname}-*"
-    }
+    },
+    "ltex.trace.server": "verbose",
+
 }

@@ -65,5 +65,9 @@
   {
     "key": "ctrl+i",
     "command": "composerMode.agent"
+  },
+  {
+    "key": "ctrl+k ctrl",
+    "command": "ltex.checkSelection"
   }
 ]
