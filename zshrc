@@ -216,3 +216,7 @@ cursor() {
 export PATH="$PATH:/home/m7522667@ca.intra/.local/bin"
 
 function gi() { curl -sLw "\n" https://www.toptal.com/developers/gitignore/api/$@ ;}
+
+fpath+=~/.zfunc; autoload -Uz compinit; compinit
+
+zstyle ':completion:*' menu select
