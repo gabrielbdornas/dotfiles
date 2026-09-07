@@ -1,0 +1,11 @@
+[Unit]
+Description=Pull and apply dotfiles updates
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/env bash %h/.dotfiles/setup/sync.sh
+
+[Install]
+WantedBy=default.target
