@@ -19,7 +19,7 @@ if ! command -v gh >/dev/null 2>&1; then
     apt)
       if dpkg -s gitsome >/dev/null 2>&1; then
         echo "-----> Removing conflicting gitsome package..."
-        sudo apt remove -y gitsome
+        sudo env DEBIAN_FRONTEND=noninteractive apt remove -y gitsome
       fi
 
       curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
@@ -29,7 +29,7 @@ if ! command -v gh >/dev/null 2>&1; then
         | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
 
       sudo apt update
-      sudo apt install -y gh
+      sudo env DEBIAN_FRONTEND=noninteractive apt install -y gh
       ;;
     pacman)
       # Arch's package is just called github-cli.

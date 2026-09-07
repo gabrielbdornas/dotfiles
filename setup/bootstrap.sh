@@ -24,17 +24,17 @@ esac
 echo "===> Installing base packages..."
 
 # lsb-release is deliberately not here: detect_distro() reads /etc/os-release
-# directly, so nothing needs the lsb_release binary.
-BASE_PACKAGES=(
-  curl
-  ca-certificates
-  gnupg
-  zsh
-  vim
-  unzip
-  jq
-  tree
-)
+# directly, so nothing needs the lsb_release binary. Package sets differ per
+# distro on purpose: apt needs `locales` for locale-gen to exist at all
+# (glibc bundles it directly on Arch, so pacman doesn't).
+case "$DISTRO_MGR" in
+  apt)
+    BASE_PACKAGES=(curl ca-certificates gnupg zsh vim unzip jq tree locales)
+    ;;
+  pacman)
+    BASE_PACKAGES=(curl ca-certificates gnupg zsh vim unzip jq tree)
+    ;;
+esac
 
 TO_INSTALL=()
 for pkg in "${BASE_PACKAGES[@]}"; do

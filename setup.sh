@@ -25,7 +25,7 @@ if ! command -v git >/dev/null 2>&1; then
 
   if command -v apt >/dev/null 2>&1; then
     sudo apt update
-    sudo apt install -y git
+    sudo env DEBIAN_FRONTEND=noninteractive apt install -y git
   elif command -v pacman >/dev/null 2>&1; then
     sudo pacman -Sy --needed --noconfirm git
   else

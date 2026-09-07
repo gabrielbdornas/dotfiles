@@ -37,7 +37,11 @@ pkg_install() {
   mgr="$(detect_distro)"
 
   case "$mgr" in
-    apt) sudo apt install -y "$@" ;;
+    # DEBIAN_FRONTEND=noninteractive is set via `env`, not a plain
+    # `sudo VAR=val` prefix, since whether sudo passes that through depends
+    # on the machine's sudoers env_keep config - `env` sets it unconditionally
+    # for apt's own process, entirely inside the privileged command sudo runs.
+    apt) sudo env DEBIAN_FRONTEND=noninteractive apt install -y "$@" ;;
     pacman) sudo pacman -S --needed --noconfirm "$@" ;;
     *)
       echo "Unsupported package manager. Only apt and pacman based systems are supported."

@@ -16,3 +16,4 @@ consequences (including what it deliberately leaves out). See the root
 | [0007](0007-async-login-sync-defer-shutdown-autocommit.md) | Sync on login only, async, via systemd; shutdown auto-commit deferred |
 | [0008](0008-infra-only-scope-for-this-pass.md) | This pass is infrastructure only — `old_process/` content migration deferred |
 | [0009](0009-require-repo-env-var-fail-fast.md) | `setup.sh` requires `REPO` via `export`, fails fast instead of a hardcoded default |
+| [0010](0010-noninteractive-apt-and-distro-specific-packages.md) | Non-interactive apt installs, and per-distro base package lists |
