@@ -20,7 +20,11 @@ export REPO="gabrielbdornas/dotfiles" \
   && curl -fsSL "https://raw.githubusercontent.com/${REPO}/main/setup.sh" | bash
 ```
 
-All four must be `export`ed, not just set — see the Q&A below for why.
+All four must be `export`ed, not just set — see the Q&A below for why. If
+your Infisical is self-hosted (not `app.infisical.com`), also export
+`INFISICAL_DOMAIN="https://your-instance.com"` (bare origin, no `/api`
+suffix) — the `infisical` CLI reads this env var itself, no script change
+needed.
 Supports Debian/Ubuntu and Arch (including under WSL). `setup.sh` installs
 `gh` and the `infisical` CLI, pulls a GitHub token out of Infisical (secret
 name `GH_TOKEN`, from the project/environment above), authenticates `gh`

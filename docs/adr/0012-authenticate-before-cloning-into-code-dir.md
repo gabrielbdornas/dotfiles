@@ -46,6 +46,16 @@ required to make that non-interactive - into `setup.sh`, before the clone:
    lives in `setup/lib.sh`, which doesn't exist pre-clone.
 3. Fetch a secret named `GH_TOKEN` via `infisical run --token=... --projectId=... --env=... -- printenv GH_TOKEN`,
    then `gh auth login --with-token` with it - no browser involved.
+   Self-hosted Infisical instances need one more optional variable,
+   `INFISICAL_DOMAIN` (bare origin, e.g. `https://your-instance.com`, no
+   `/api` suffix) - confirmed directly in `Infisical/cli`'s `root.go`:
+   `--domain` is a *persistent* flag (applies to `run` too, not just
+   `login`), defaulting to `app.infisical.com`, with precedence `--domain`
+   flag > `INFISICAL_DOMAIN` env var > `.infisical.json` > default. Since
+   `setup.sh` never passes `--domain` explicitly, exporting `INFISICAL_DOMAIN`
+   is picked up automatically - no code change needed here at all. Not
+   fail-fast like the other four, since it's only required for self-hosted/
+   non-US-Cloud users, not the common case.
 4. Generate an SSH key (`ssh-keygen -t ed25519`, empty passphrase) if one
    doesn't exist, and register it with `gh ssh-key add` if not already
    registered. This needs `openssh-client` (apt) / `openssh` (pacman) -
