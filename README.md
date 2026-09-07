@@ -13,22 +13,33 @@ the repo.
 ## Setup a new machine
 
 ```bash
-export REPO="gabrielbdornas/dotfiles" && curl -fsSL "https://raw.githubusercontent.com/${REPO}/main/setup.sh" | bash
+export REPO="gabrielbdornas/dotfiles" \
+       INFISICAL_TOKEN="<machine identity token>" \
+       INFISICAL_PROJECT_ID="<infisical project id>" \
+       INFISICAL_ENV="home" \
+  && curl -fsSL "https://raw.githubusercontent.com/${REPO}/main/setup.sh" | bash
 ```
 
-`REPO` must be `export`ed, not just set — see the Q&A below for why.
-Supports Debian/Ubuntu and Arch (including under WSL). On first run you'll
-be asked which profile this machine is (see below) and, if not already
-authenticated, to log in to GitHub CLI.
+All four must be `export`ed, not just set — see the Q&A below for why.
+Supports Debian/Ubuntu and Arch (including under WSL). `setup.sh` installs
+`gh` and the `infisical` CLI, pulls a GitHub token out of Infisical (secret
+name `GH_TOKEN`, from the project/environment above), authenticates `gh`
+with it, generates and registers an SSH key, then clones this repo into
+`~/code/<your-github-username>/dotfiles` — that requires the `GH_TOKEN`
+secret's PAT to carry SSH-key-management permission
+(`admin:public_key`/"SSH keys"). Everything after the clone (shell,
+plugins, dotfile symlinks, the sync service) proceeds automatically.
 
 ## Update an already-set-up machine
 
 Runs automatically once per login in the background (see
 `setup/systemd/dotfiles-sync.service`) — you'll get a desktop notification
-when it finishes or fails. To run it by hand instead:
+when it finishes or fails. To run it by hand instead, source the location
+`setup.sh` recorded for you (the repo lives at
+`~/code/<your-github-username>/dotfiles`, not a fixed path — see the Q&A):
 
 ```bash
-bash ~/.dotfiles/setup/sync.sh
+source ~/.config/dotfiles/env && bash "$DOTFILES_DIR/setup/sync.sh"
 ```
 
 ## Machine profile
@@ -45,7 +56,7 @@ the answer in `~/.config/dotfiles/profile`.
 
 ## Pushing your own changes back
 
-Not automated yet — edit, then from `~/.dotfiles`:
+Not automated yet — edit, then from `~/code/<your-github-username>/dotfiles`:
 
 ```bash
 git add -A
@@ -62,10 +73,11 @@ testing it against a real Ubuntu container.
 ## Layout
 
 ```
-setup.sh                entrypoint — curl this
+setup.sh                entrypoint — curl this. git/gh/jq/infisical install,
+                         GitHub auth via Infisical token, SSH key, clone
 setup/bootstrap.sh       base packages, sudo, locale
-setup/system.sh          system-level tools (GitHub CLI)
-setup/user.sh            shell, plugins, dotfile symlinks, gh auth, workspace
+setup/system.sh          system-level tools (currently empty - gh moved to setup.sh)
+setup/user.sh            shell, plugins, dotfile symlinks, sync service install
 setup/lib.sh             shared helpers (distro/WSL detection, symlink helper, ...)
 setup/sync.sh            pull + re-apply, run by the systemd unit
 config/hypr/             example dotfiles proving the symlink pattern
@@ -76,10 +88,11 @@ old_process/             previous approach, kept as reference
 
 Each script hands off to the next: `setup.sh` → `bootstrap.sh` →
 `system.sh` → `user.sh`. See [`docs/adr/0003`](docs/adr/0003-setup-script-architecture.md)
-for why, and the rest of `docs/adr/` for every other decision baked into
-this layout (multi-distro support, the profile mechanism, secrets via
-Infisical, the symlink safety behavior, sync timing, and what's
-deliberately not migrated yet).
+for the original shape and [`docs/adr/0012`](docs/adr/0012-authenticate-before-cloning-into-code-dir.md)
+for why `setup.sh` ended up taking on so much more than "just clone the
+repo," and the rest of `docs/adr/` for every other decision baked into this
+layout (multi-distro support, the profile mechanism, the symlink safety
+behavior, sync timing, and what's deliberately not migrated yet).
 
 ## Q&A
 
@@ -128,3 +141,20 @@ URL itself (that's how `curl` finds the file to fetch), and once in
 `export REPO=...` (so `setup.sh` knows what to `git clone`). There's no
 way for the script to recover the URL it was fetched from and skip the
 second one.
+
+The same reasoning applies to `INFISICAL_TOKEN`, `INFISICAL_PROJECT_ID`,
+and `INFISICAL_ENV` — all three are read inside `setup.sh` itself, so all
+three need `export`, not just `=`, for the same stdin-is-the-pipe reason.
+
+**Q: Why does the repo end up at `~/code/<username>/dotfiles` instead of `~/.dotfiles`?**
+
+Originally it was a fixed `~/.dotfiles`. But once `gh` auth moved into
+`setup.sh` (to fetch a token from Infisical before doing anything else -
+see [`docs/adr/0012`](docs/adr/0012-authenticate-before-cloning-into-code-dir.md)),
+`$GITHUB_USERNAME` becomes knowable *before* the clone, matching
+[Le Wagon's own convention](https://github.com/lewagon/setup/blob/master/ubuntu.md)
+of putting every repo — dotfiles included — under `~/code/<username>/`.
+Since the path now varies per machine, it can't be hardcoded in
+`setup/systemd/dotfiles-sync.service` the way `~/.dotfiles` was; `setup.sh`
+records it in `~/.config/dotfiles/env` instead, which both the systemd unit
+and the "update by hand" command above read from.

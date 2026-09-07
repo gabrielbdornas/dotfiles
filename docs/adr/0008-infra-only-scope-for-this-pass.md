@@ -46,3 +46,10 @@ obligated to replicate exactly.
   in `user.sh` are explicitly part of that deferred migration, not this
   pass — see `setup/system.sh`'s comment for the specific VS Code
   omission.
+
+> **Update ([0012](0012-authenticate-before-cloning-into-code-dir.md)):**
+> "real Infisical-backed secret values" turned out not to wait for content
+> migration after all - `gh` authentication via an Infisical-sourced
+> `GH_TOKEN` was pulled forward into this same pass, moving into `setup.sh`
+> ahead of the clone. The repo also now installs to
+> `~/code/$GITHUB_USERNAME/dotfiles` rather than `~/.dotfiles`.

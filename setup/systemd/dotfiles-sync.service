@@ -5,7 +5,11 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/env bash %h/.dotfiles/setup/sync.sh
+# The repo now lives at ~/code/$GITHUB_USERNAME/dotfiles, which varies per
+# machine, so the path can't be hardcoded here the way ~/.dotfiles was -
+# setup.sh records it in ~/.config/dotfiles/env (DOTFILES_DIR=...) for this
+# to source. See docs/adr/0012.
+ExecStart=/usr/bin/env bash -c 'source "%h/.config/dotfiles/env" && exec bash "$DOTFILES_DIR/setup/sync.sh"'
 
 [Install]
 WantedBy=default.target

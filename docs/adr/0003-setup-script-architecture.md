@@ -40,9 +40,16 @@ Responsibilities, per the earlier design conversation:
 - **`bootstrap.sh`** — base OS packages, sudo, locale. Everything that has
   to exist before system- or user-level tools can be installed.
 - **`system.sh`** — system-level tools not tied to a user identity
-  (currently just GitHub CLI).
-- **`user.sh`** — everything user-specific: shell, dotfiles, `gh`
-  authentication, workspace directory, the sync service.
+  (currently empty - see the update below).
+- **`user.sh`** — everything user-specific: shell, dotfiles, the sync
+  service.
+
+> **Update ([0012](0012-authenticate-before-cloning-into-code-dir.md)):**
+> GitHub CLI installation and authentication moved from `system.sh`/`user.sh`
+> into `setup.sh` itself, ahead of the clone - needing `$GITHUB_USERNAME`
+> before knowing where to clone the repo forced `setup.sh` to take on far
+> more than "just get git and clone," reversing this ADR's "keep it minimal"
+> framing for that one script.
 
 ## Consequences
 

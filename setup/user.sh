@@ -53,19 +53,9 @@ echo "===> Linking example dotfiles..."
 link_dotfile "$REPO_ROOT/config/hypr/keybindings.conf" "$HOME/.config/hypr/keybindings.conf"
 link_dotfile "$REPO_ROOT/config/hypr/monitors.conf" "$HOME/.config/hypr/monitors.conf"
 
-# GitHub authentication + workspace
-if ! gh auth status >/dev/null 2>&1; then
-  echo "===> Please authenticate with GitHub..."
-  gh auth login -s 'user:email' -w --git-protocol ssh
-else
-  echo "-----> GitHub already authenticated"
-fi
-
-if gh auth status >/dev/null 2>&1; then
-  GITHUB_USERNAME="$(gh api user | jq -r '.login')"
-  echo "-----> GitHub user: $GITHUB_USERNAME"
-  mkdir -p "$HOME/code/$GITHUB_USERNAME"
-fi
+# GitHub auth, the SSH key, and the ~/code/$GITHUB_USERNAME workspace (which
+# is now where this repo itself lives) all happen in setup.sh instead, before
+# the clone - see docs/adr/0012.
 
 # Login-time sync service (async, non-blocking - see setup/sync.sh)
 echo "===> Installing dotfiles-sync systemd unit..."

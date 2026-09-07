@@ -39,3 +39,11 @@ from.
   `bootstrap.sh` or `system.sh` responsibility when that work starts.
 - Until then, anything that would need a secret is simply not migrated
   yet.
+
+> **Update ([0012](0012-authenticate-before-cloning-into-code-dir.md)):**
+> the `GH_TOKEN` secret (a GitHub PAT, used for non-interactive `gh` auth)
+> is now a real, working use of Infisical - installed and authenticated in
+> `setup.sh` itself, via `INFISICAL_TOKEN`/`INFISICAL_PROJECT_ID`/
+> `INFISICAL_ENV` rather than `DOTFILES_PROFILE`. This "hook point only"
+> framing no longer applies to that specific secret; other secrets (e.g.
+> git identity) are still deferred.

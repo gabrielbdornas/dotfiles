@@ -18,3 +18,4 @@ consequences (including what it deliberately leaves out). See the root
 | [0009](0009-require-repo-env-var-fail-fast.md) | `setup.sh` requires `REPO` via `export`, fails fast instead of a hardcoded default |
 | [0010](0010-noninteractive-apt-and-distro-specific-packages.md) | Non-interactive apt installs, and per-distro base package lists |
 | [0011](0011-strip-repo-before-third-party-installers.md) | Strip `REPO` before invoking third-party installers (Oh My Zsh reads the same name) |
+| [0012](0012-authenticate-before-cloning-into-code-dir.md) | Authenticate gh via Infisical before cloning; install into `~/code/$GITHUB_USERNAME/dotfiles` |
