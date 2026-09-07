@@ -1,5 +1,7 @@
 In this file I want to explain the ideas to this repository.
 
+Previus Chagpt discussion: https://chatgpt.com/share/6a6bd04d-c888-83e9-8290-0b2b5e03ae4b (it's open and everybody could see).
+
 It'll be used to:
 
 - setup/update all my different machines (home, work).
