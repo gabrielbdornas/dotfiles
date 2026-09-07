@@ -2,10 +2,13 @@
 set -euo pipefail
 
 # Run with:
-# REPO="gabrielbdornas/dotfiles"
-# curl -fsSL "https://raw.githubusercontent.com/${REPO}/main/setup.sh" | bash
+# export REPO="yourname/dotfiles" && curl -fsSL "https://raw.githubusercontent.com/${REPO}/main/setup.sh" | bash
 
-REPO="${REPO:-gabrielbdornas/dotfiles}"
+# No hardcoded default on purpose - fail fast with a clear message instead
+# of silently installing the wrong repo if REPO wasn't exported before this
+# script ran (a plain, non-exported REPO=... in the calling shell does NOT
+# reach this process - see docs/adr/0009 for why).
+: "${REPO:?REPO is required. Set it, e.g.: export REPO=\"yourname/dotfiles\"}"
 REPO_URL="https://github.com/$REPO.git"
 INSTALL_DIR="$HOME/.dotfiles"
 

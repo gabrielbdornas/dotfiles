@@ -13,10 +13,10 @@ the repo.
 ## Setup a new machine
 
 ```bash
-REPO="gabrielbdornas/dotfiles"
-curl -fsSL "https://raw.githubusercontent.com/${REPO}/main/setup.sh" | bash
+export REPO="gabrielbdornas/dotfiles" && curl -fsSL "https://raw.githubusercontent.com/${REPO}/main/setup.sh" | bash
 ```
 
+`REPO` must be `export`ed, not just set — see the Q&A below for why.
 Supports Debian/Ubuntu and Arch (including under WSL). On first run you'll
 be asked which profile this machine is (see below) and, if not already
 authenticated, to log in to GitHub CLI.
@@ -53,6 +53,12 @@ git commit -m "..."
 git push
 ```
 
+## Testing on another distro
+
+Day-to-day development happens on Arch, so the apt branch of `setup/` is
+otherwise unverified. See [`docker/README.md`](docker/README.md) for
+testing it against a real Ubuntu container.
+
 ## Layout
 
 ```
@@ -64,6 +70,7 @@ setup/lib.sh             shared helpers (distro/WSL detection, symlink helper, .
 setup/sync.sh            pull + re-apply, run by the systemd unit
 config/hypr/             example dotfiles proving the symlink pattern
 docs/adr/                why things are built this way
+docker/                  Ubuntu container for testing the apt branch
 old_process/             previous approach, kept as reference
 ```
 
@@ -104,3 +111,20 @@ trigger inside an `if condition; then ...`, an `&&`/`||` chain, or a
 function called from one of those — which is why the scripts still use
 explicit `if ! command; then ...` checks throughout instead of relying on
 `-e` alone.
+
+**Q: Why does `REPO` need `export`, not just `REPO=...`?**
+
+`curl -fsSL <url> | bash` streams the downloaded script straight into a
+*new* `bash` process's stdin — it's never saved to disk first. A plain
+`REPO="x"` set in your shell before that command stays local to your
+shell; it does **not** carry over into that new process. Only an
+`export`ed variable is inherited by child processes. `setup.sh` has no
+hardcoded fallback (see [`docs/adr/0009`](docs/adr/0009-require-repo-env-var-fail-fast.md)),
+so without `export` it fails immediately with a clear error instead of
+silently doing the wrong thing.
+
+Note you still type the repo name twice either way: once in the `curl`
+URL itself (that's how `curl` finds the file to fetch), and once in
+`export REPO=...` (so `setup.sh` knows what to `git clone`). There's no
+way for the script to recover the URL it was fetched from and skip the
+second one.
