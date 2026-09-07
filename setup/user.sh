@@ -14,9 +14,15 @@ echo "-----> Profile for this machine: $PROFILE"
 # Oh My Zsh. RUNZSH=no CHSH=no so it doesn't hijack this setup shell or
 # change the login shell mid-install - that's left as an explicit,
 # separate step later if wanted.
+#
+# `env -u REPO` strips our own exported REPO before running this - Oh My
+# Zsh's installer reads a same-named REPO env var itself (to support
+# installing from a fork: REPO=${REPO:-ohmyzsh/ohmyzsh}), so without this
+# our dotfiles' REPO leaks in and it clones this dotfiles repo instead of
+# ohmyzsh/ohmyzsh. See docs/adr/0011.
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
   echo "===> Installing Oh My Zsh..."
-  RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  env -u REPO RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 else
   echo "-----> Oh My Zsh already installed"
 fi
