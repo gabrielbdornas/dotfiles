@@ -107,7 +107,7 @@ if [ ! -f "$SSH_KEY" ]; then
   echo "===> Generating SSH key..."
   mkdir -p "$HOME/.ssh"
   chmod 700 "$HOME/.ssh"
-  ssh-keygen -t ed25519 -f "$SSH_KEY" -N "" -C "$(whoami)@$(hostname)"
+  ssh-keygen -t ed25519 -f "$SSH_KEY" -N "" -C "$(whoami)@$(uname -n)"
 fi
 
 # Pre-accept GitHub's host key non-interactively - without this, the first
@@ -123,7 +123,7 @@ fi
 # that specific failure as success is the idempotency check here. Worth
 # confirming gh's exact wording hasn't changed if this ever misfires.
 GH_SSH_KEY_ADD_ERR="$(mktemp)"
-if ! gh ssh-key add "$SSH_KEY.pub" --title "$(hostname)" 2>"$GH_SSH_KEY_ADD_ERR"; then
+if ! gh ssh-key add "$SSH_KEY.pub" --title "$(uname -n)" 2>"$GH_SSH_KEY_ADD_ERR"; then
   if grep -qi "already in use\|already exists" "$GH_SSH_KEY_ADD_ERR"; then
     echo "-----> SSH key already registered with GitHub"
   else

@@ -24,3 +24,4 @@ consequences (including what it deliberately leaves out). See the root
 | [0015](0015-omarchy-confirms-0014-and-symlink-collision-still-untested.md) | (Proposed) Omarchy confirms 0014; the symlink collision path (0006) is still untested |
 | [0016](0016-omarchy-only-not-a-desktop-dispatcher.md) | Gate Omarchy dotfiles with `is_omarchy()`, not a general desktop dispatcher |
 | [0017](0017-omarchy-only-drop-multi-distro-support.md) | Drop multi-distro (apt) support entirely, require Omarchy specifically |
+| [0018](0018-use-uname-n-not-hostname-for-key-naming.md) | Use `uname -n`, not `hostname`, for SSH key naming - `hostname` isn't installed on Omarchy |
