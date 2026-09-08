@@ -23,7 +23,7 @@ install-if-missing code paths instead of silently skipping them.
 From the repo root:
 
 ```bash
-docker build -t dotfiles-omarchy-test -f docker/omarchy-test.Dockerfile .
+docker build -t dotfiles-omarchy-test -f docker/omarchy_test.Dockerfile .
 ```
 
 ## Run
