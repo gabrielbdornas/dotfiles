@@ -1,7 +1,7 @@
 # dotfiles
 
-Personal dotfiles and machine setup for multiple Linux machines (home,
-work), bootstrapped with a single command and kept in sync afterwards.
+Personal dotfiles and machine setup for Omarchy machines, bootstrapped
+with a single command and kept in sync afterwards.
 
 `old_process/` is the previous approach (forked from Le Wagon's bootcamp
 dotfiles) — kept as a reference, not deleted, not replicated exactly.
@@ -25,14 +25,18 @@ your Infisical is self-hosted (not `app.infisical.com`), also export
 `INFISICAL_DOMAIN="https://your-instance.com"` (bare origin, no `/api`
 suffix) — the `infisical` CLI reads this env var itself, no script change
 needed.
-Supports Debian/Ubuntu and Arch (including under WSL). `setup.sh` installs
-`gh` and the `infisical` CLI, pulls a GitHub token out of Infisical (secret
-name `GH_TOKEN`, from the project/environment above), authenticates `gh`
-with it, generates and registers an SSH key, then clones this repo into
-`~/code/<your-github-username>/dotfiles` — that requires the `GH_TOKEN`
-secret's PAT to carry SSH-key-management permission
-(`admin:public_key`/"SSH keys"). Everything after the clone (shell,
-plugins, dotfile symlinks, the sync service) proceeds automatically.
+
+Requires Omarchy specifically — `setup.sh` checks `/etc/os-release` for
+`ID=omarchy` and fails fast otherwise, even on plain (non-Omarchy) Arch
+(see [`docs/adr/0017`](docs/adr/0017-omarchy-only-drop-multi-distro-support.md)).
+`setup.sh` installs `gh` and the `infisical` CLI, pulls a GitHub token out
+of Infisical (secret name `GH_TOKEN`, from the project/environment above),
+authenticates `gh` with it, generates and registers an SSH key, then
+clones this repo into `~/code/<your-github-username>/dotfiles` — that
+requires the `GH_TOKEN` secret's PAT to carry SSH-key-management
+permission (`admin:public_key`/"SSH keys"). Everything after the clone
+(shell, plugins, dotfile symlinks, the sync service) proceeds
+automatically.
 
 ## Update an already-set-up machine
 
@@ -68,12 +72,12 @@ git commit -m "..."
 git push
 ```
 
-## Testing on another distro
+## Testing without a real Omarchy machine
 
-Three Docker images validate `setup/` end to end: Ubuntu (apt branch),
-Arch (pacman branch), and Omarchy (pacman branch, plus the dotfile-symlink
-collision-safety path against Omarchy's real config layout). See
-[`docker/README.md`](docker/README.md) for how to build and run them.
+A Docker image approximates Omarchy for testing `setup/` end to end,
+including the dotfile-symlink collision-safety path against Omarchy's real
+config layout. See [`docker/README.md`](docker/README.md) for how to build
+and run it.
 
 ## Layout
 
@@ -83,11 +87,11 @@ setup.sh                entrypoint — curl this. git/gh/jq/infisical install,
 setup/bootstrap.sh       base packages, sudo, locale
 setup/system.sh          system-level tools (currently empty - gh moved to setup.sh)
 setup/user.sh            shell, plugins, dotfile symlinks, sync service install
-setup/lib.sh             shared helpers (distro/WSL detection, symlink helper, ...)
+setup/lib.sh             shared helpers (Omarchy check, symlink helper, ...)
 setup/sync.sh            pull + re-apply, run by the systemd unit
 config/hypr/             example dotfiles proving the symlink pattern
 docs/adr/                why things are built this way
-docker/                  Ubuntu/Arch/Omarchy containers for testing setup/
+docker/                  Omarchy-approximation container for testing setup/
 old_process/             previous approach, kept as reference
 ```
 
@@ -96,8 +100,9 @@ Each script hands off to the next: `setup.sh` → `bootstrap.sh` →
 for the original shape and [`docs/adr/0012`](docs/adr/0012-authenticate-before-cloning-into-code-dir.md)
 for why `setup.sh` ended up taking on so much more than "just clone the
 repo," and the rest of `docs/adr/` for every other decision baked into this
-layout (multi-distro support, the profile mechanism, the symlink safety
-behavior, sync timing, and what's deliberately not migrated yet).
+layout (why Omarchy-only per [`docs/adr/0017`](docs/adr/0017-omarchy-only-drop-multi-distro-support.md),
+the profile mechanism, the symlink safety behavior, sync timing, and what's
+deliberately not migrated yet).
 
 ## Q&A
 
@@ -118,10 +123,11 @@ It's three shell options bundled together:
   like `rm -rf "$SCRIPT_DIR/..."` quietly run against an empty path.
 - **`pipefail`**: a pipeline's exit status is normally just its *last*
   command's, so `false | true` "succeeds." With `pipefail`, the whole
-  pipeline fails if *any* stage does — which matters in `setup/system.sh`'s
-  `curl ... | sudo dd of=...` for the GitHub CLI key: without it, a failed
-  `curl` would be masked by `dd` succeeding on empty input, leaving a
-  broken key in place with no error raised.
+  pipeline fails if *any* stage does — which matters in `setup.sh`'s
+  `curl ... | grep ... | sed ...` for resolving the Infisical CLI's
+  download URL: without it, a failed `curl` would be masked by `grep`/`sed`
+  succeeding trivially on empty input, potentially leaving `INFISICAL_PKG_URL`
+  silently empty instead of the script stopping right there.
 
 Net effect: these scripts fail loudly and immediately rather than limping
 forward into a half-configured machine. One caveat: `-e` does **not**

@@ -53,3 +53,8 @@ obligated to replicate exactly.
 > `GH_TOKEN` was pulled forward into this same pass, moving into `setup.sh`
 > ahead of the clone. The repo also now installs to
 > `~/code/$GITHUB_USERNAME/dotfiles` rather than `~/.dotfiles`.
+
+> **Update ([0017](0017-omarchy-only-drop-multi-distro-support.md)):**
+> "multi-distro Linux (apt + pacman)" from this ADR's original locked-in
+> decisions no longer holds either - apt support was dropped entirely, and
+> this repo now requires Omarchy specifically.

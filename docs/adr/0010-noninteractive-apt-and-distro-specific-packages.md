@@ -2,7 +2,10 @@
 
 ## Status
 
-Accepted
+Superseded by [0017](0017-omarchy-only-drop-multi-distro-support.md) - apt
+support was dropped entirely, so `DEBIAN_FRONTEND=noninteractive` and the
+apt-only `locales` package no longer exist in the code. Kept here as the
+historical record of the bugs that prompted this fix at the time.
 
 ## Context
 

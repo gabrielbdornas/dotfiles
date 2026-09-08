@@ -85,7 +85,16 @@ environment actually needs dotfiles of its own.
   care which machine it's asked on.
 - If a second real desktop environment does need its own dotfiles someday,
   this pattern extends by adding one more `is_<thing>()` check next to
-  `is_omarchy()`/`is_wsl()`, not by retrofitting a dispatcher that was built
+  `is_omarchy()`, not by retrofitting a dispatcher that was built
   speculatively.
 - The "unify colleagues' WSL setup" idea is shelved, not designed around -
   revisit if it becomes a real goal again, rather than pre-building for it.
+
+> **Update ([0017](0017-omarchy-only-drop-multi-distro-support.md)):**
+> the tradeoff above ("Pop!_OS and WSL machines get the shared shell/tooling
+> layer... which is already correct for both today") no longer holds - 0017
+> went further and dropped apt support entirely, so Pop!_OS gets nothing at
+> all now, not even that shared layer. This ADR's own decision
+> (`is_omarchy()` gates the desktop dotfiles) is unchanged and still
+> correct; `is_wsl()` referenced above was removed in 0017 as well (it was
+> already fully dead code, unrelated to this ADR's reasoning).

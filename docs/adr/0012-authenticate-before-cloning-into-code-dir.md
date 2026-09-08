@@ -110,3 +110,10 @@ empty stub again, pending real system-level tools (VS Code, per
   `setup.sh`'s own git-install branch because of it) - only
   `sudo`/`curl`/`ca-certificates` remain, the bare minimum to run the curl
   one-liner at all.
+
+> **Update ([0017](0017-omarchy-only-drop-multi-distro-support.md)):**
+> `docker/ubuntu-test.Dockerfile` referenced above no longer exists at all -
+> apt support was dropped entirely, along with the apt branches of the
+> git/gh/jq/openssh/Infisical installs described here. Everything else in
+> this ADR (auth-before-clone, the SSH key flow, `~/code/$GITHUB_USERNAME/dotfiles`)
+> stands unchanged.

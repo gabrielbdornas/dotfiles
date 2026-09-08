@@ -7,41 +7,26 @@ source "$SCRIPT_DIR/lib.sh"
 
 echo "===> [1/3] Bootstrap: preparing system..."
 
-sudo_keepalive
-
-DISTRO_MGR="$(detect_distro)"
-if [ "$DISTRO_MGR" = "unsupported" ]; then
-  echo "Unsupported distro. Only apt and pacman based systems are supported."
+# setup.sh already checks this before cloning, but bootstrap.sh can also
+# run without going through setup.sh first - setup/sync.sh re-runs it
+# directly on every login, and it's the entry point for local Docker
+# testing too. See docs/adr/0017.
+if ! is_omarchy; then
+  echo "This only supports Omarchy machines. See docs/adr/0017." >&2
   exit 1
 fi
 
+sudo_keepalive
+
 echo "===> Updating package lists..."
-case "$DISTRO_MGR" in
-  apt) sudo apt update ;;
-  pacman) sudo pacman -Sy ;;
-esac
+sudo pacman -Sy
 
 echo "===> Installing base packages..."
-
-# lsb-release is deliberately not here: detect_distro() reads /etc/os-release
-# directly, so nothing needs the lsb_release binary. Package sets differ per
-# distro on purpose: apt needs `locales` for locale-gen to exist at all
-# (glibc bundles it directly on Arch, so pacman doesn't).
-case "$DISTRO_MGR" in
-  apt)
-    BASE_PACKAGES=(curl ca-certificates gnupg zsh vim unzip jq tree locales)
-    ;;
-  pacman)
-    BASE_PACKAGES=(curl ca-certificates gnupg zsh vim unzip jq tree)
-    ;;
-esac
+BASE_PACKAGES=(curl ca-certificates gnupg zsh vim unzip jq tree)
 
 TO_INSTALL=()
 for pkg in "${BASE_PACKAGES[@]}"; do
-  case "$DISTRO_MGR" in
-    apt) dpkg -s "$pkg" >/dev/null 2>&1 || TO_INSTALL+=("$pkg") ;;
-    pacman) pacman -Qi "$pkg" >/dev/null 2>&1 || TO_INSTALL+=("$pkg") ;;
-  esac
+  pacman -Qi "$pkg" >/dev/null 2>&1 || TO_INSTALL+=("$pkg")
 done
 
 if [ ${#TO_INSTALL[@]} -gt 0 ]; then
@@ -53,15 +38,8 @@ fi
 
 echo "===> Generating locale (en_US.UTF-8)..."
 if ! locale -a | grep -qi "en_US\.utf-8"; then
-  case "$DISTRO_MGR" in
-    apt)
-      sudo locale-gen en_US.UTF-8
-      ;;
-    pacman)
-      sudo sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
-      sudo locale-gen
-      ;;
-  esac
+  sudo sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+  sudo locale-gen
 fi
 
 echo "===> Bootstrap complete"

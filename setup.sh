@@ -15,45 +15,29 @@ set -euo pipefail
 : "${INFISICAL_PROJECT_ID:?INFISICAL_PROJECT_ID is required - the Infisical project holding your GH_TOKEN secret.}"
 : "${INFISICAL_ENV:?INFISICAL_ENV is required - the Infisical environment name for this machine, e.g. home or work.}"
 
+# This only supports Omarchy, not Arch generally and not any other distro -
+# see docs/adr/0017. Checked via a subshell so /etc/os-release's other
+# fields don't leak into this script's own variables.
+if ! ( . /etc/os-release; [ "$ID" = "omarchy" ] ); then
+  echo "This only supports Omarchy machines (checked /etc/os-release for ID=omarchy). See docs/adr/0017." >&2
+  exit 1
+fi
+
 echo "===> Starting setup..."
 
 echo "===> Requesting sudo access..."
 sudo -v
 
-# setup/lib.sh doesn't exist yet at this point (it lives inside the repo
-# we're about to clone), so package-manager detection has to be inlined
-# here rather than shared - same reasoning as the original git-only version
-# of this script, now covering gh/jq/infisical too.
-if command -v apt >/dev/null 2>&1; then
-  EARLY_PKG_MGR="apt"
-elif command -v pacman >/dev/null 2>&1; then
-  EARLY_PKG_MGR="pacman"
-else
-  echo "Unsupported package manager. Only apt and pacman based systems are supported." >&2
-  exit 1
-fi
-
-early_pkg_install() {
-  case "$EARLY_PKG_MGR" in
-    apt) sudo env DEBIAN_FRONTEND=noninteractive apt install -y "$@" ;;
-    pacman) sudo pacman -S --needed --noconfirm "$@" ;;
-  esac
-}
-
-if [ "$EARLY_PKG_MGR" = "apt" ]; then
-  sudo apt update
-else
-  sudo pacman -Sy
-fi
+sudo pacman -Sy
 
 if ! command -v git >/dev/null 2>&1; then
   echo "===> Installing git..."
-  early_pkg_install git
+  sudo pacman -S --needed --noconfirm git
 fi
 
 if ! command -v jq >/dev/null 2>&1; then
   echo "===> Installing jq..."
-  early_pkg_install jq
+  sudo pacman -S --needed --noconfirm jq
 fi
 
 # GitHub CLI - same install logic that used to live in setup/system.sh,
@@ -61,60 +45,34 @@ fi
 # $GITHUB_USERNAME, which now determines where the repo itself gets cloned.
 if ! command -v gh >/dev/null 2>&1; then
   echo "===> Installing GitHub CLI..."
-  case "$EARLY_PKG_MGR" in
-    apt)
-      if dpkg -s gitsome >/dev/null 2>&1; then
-        echo "-----> Removing conflicting gitsome package..."
-        sudo env DEBIAN_FRONTEND=noninteractive apt remove -y gitsome
-      fi
-      curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
-        | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-      echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
-        | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
-      sudo apt update
-      early_pkg_install gh
-      ;;
-    pacman)
-      # Arch's package is just called github-cli.
-      early_pkg_install github-cli
-      ;;
-  esac
+  sudo pacman -S --needed --noconfirm github-cli
 fi
 
-# Infisical CLI. apt has an official repo; Arch's official method (`yay -S
-# infisical-bin`) needs an AUR helper we don't want to bootstrap just for
-# this, so on pacman we install the prebuilt .pkg.tar.zst straight from
-# their GitHub releases instead - see docs/adr/0012.
+# Infisical CLI. Arch's official method (`yay -S infisical-bin`) needs an
+# AUR helper we don't want to bootstrap just for this, so this installs the
+# prebuilt .pkg.tar.zst straight from their GitHub releases instead.
 if ! command -v infisical >/dev/null 2>&1; then
   echo "===> Installing Infisical CLI..."
-  case "$EARLY_PKG_MGR" in
-    apt)
-      curl -1sLf 'https://artifacts-cli.infisical.com/setup.deb.sh' | sudo -E bash
-      sudo env DEBIAN_FRONTEND=noninteractive apt install -y infisical
-      ;;
-    pacman)
-      ARCH="$(uname -m)"
-      case "$ARCH" in
-        x86_64) INFISICAL_ARCH="amd64" ;;
-        aarch64) INFISICAL_ARCH="arm64" ;;
-        *)
-          echo "Unsupported architecture for Infisical CLI: $ARCH" >&2
-          exit 1
-          ;;
-      esac
-      INFISICAL_PKG_URL="$(curl -fsSL https://api.github.com/repos/Infisical/cli/releases/latest \
-        | grep -oE "\"browser_download_url\": *\"[^\"]+linux_${INFISICAL_ARCH}\.pkg\.tar\.zst\"" \
-        | sed -E 's/.*"(https:[^"]+)"/\1/')"
-      if [ -z "$INFISICAL_PKG_URL" ]; then
-        echo "Could not find an Infisical CLI release for linux_${INFISICAL_ARCH}." >&2
-        exit 1
-      fi
-      INFISICAL_PKG_FILE="$(mktemp --suffix=.pkg.tar.zst)"
-      curl -fsSL -o "$INFISICAL_PKG_FILE" "$INFISICAL_PKG_URL"
-      sudo pacman -U --noconfirm "$INFISICAL_PKG_FILE"
-      rm -f "$INFISICAL_PKG_FILE"
+  ARCH="$(uname -m)"
+  case "$ARCH" in
+    x86_64) INFISICAL_ARCH="amd64" ;;
+    aarch64) INFISICAL_ARCH="arm64" ;;
+    *)
+      echo "Unsupported architecture for Infisical CLI: $ARCH" >&2
+      exit 1
       ;;
   esac
+  INFISICAL_PKG_URL="$(curl -fsSL https://api.github.com/repos/Infisical/cli/releases/latest \
+    | grep -oE "\"browser_download_url\": *\"[^\"]+linux_${INFISICAL_ARCH}\.pkg\.tar\.zst\"" \
+    | sed -E 's/.*"(https:[^"]+)"/\1/')"
+  if [ -z "$INFISICAL_PKG_URL" ]; then
+    echo "Could not find an Infisical CLI release for linux_${INFISICAL_ARCH}." >&2
+    exit 1
+  fi
+  INFISICAL_PKG_FILE="$(mktemp --suffix=.pkg.tar.zst)"
+  curl -fsSL -o "$INFISICAL_PKG_FILE" "$INFISICAL_PKG_URL"
+  sudo pacman -U --noconfirm "$INFISICAL_PKG_FILE"
+  rm -f "$INFISICAL_PKG_FILE"
 fi
 
 # Fetch the GitHub token from Infisical and authenticate gh non-interactively.
@@ -135,11 +93,8 @@ else
 fi
 
 if ! command -v ssh-keygen >/dev/null 2>&1; then
-  echo "===> Installing openssh client..."
-  case "$EARLY_PKG_MGR" in
-    apt) early_pkg_install openssh-client ;;
-    pacman) early_pkg_install openssh ;;
-  esac
+  echo "===> Installing openssh..."
+  sudo pacman -S --needed --noconfirm openssh
 fi
 
 # SSH key: --with-token doesn't generate one the way the old interactive

@@ -10,8 +10,8 @@
 # Instead it reproduces the file layout a real Omarchy install leaves under
 # ~/.config/hypr by extracting Omarchy's own default/hypr directory
 # straight from their repo tarball (curl + tar only, deliberately not
-# `git clone`, so git still isn't preinstalled here either - same
-# install-if-missing reasoning as arch-test.Dockerfile).
+# `git clone`, so git still isn't preinstalled here either - it's one of
+# the install-if-missing code paths setup.sh itself is meant to exercise).
 #
 # Worth knowing: Omarchy's actual hypr config is Lua-based (bindings.lua,
 # input.lua, ...), not plain .conf files - it doesn't collide with

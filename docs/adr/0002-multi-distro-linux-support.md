@@ -2,7 +2,11 @@
 
 ## Status
 
-Accepted
+Superseded by [0017](0017-omarchy-only-drop-multi-distro-support.md) - this
+repo only supports Omarchy now. `detect_distro()` and `is_wsl()` (the
+latter already dead code by the time 0017 was written) were both removed
+from `setup/lib.sh`. Kept here as the historical record of why multi-distro
+support existed in the first place.
 
 ## Context
 

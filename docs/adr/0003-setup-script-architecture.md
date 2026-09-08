@@ -51,6 +51,12 @@ Responsibilities, per the earlier design conversation:
 > more than "just get git and clone," reversing this ADR's "keep it minimal"
 > framing for that one script.
 
+> **Update ([0017](0017-omarchy-only-drop-multi-distro-support.md)):**
+> apt/multi-distro support was dropped entirely - every package-manager
+> branch described here (and everywhere else in the chain) collapsed to
+> direct, unconditional `pacman` calls. The script chain order itself
+> (`setup.sh` → `bootstrap.sh` → `system.sh` → `user.sh`) is unaffected.
+
 ## Consequences
 
 - `git` is installed exactly once, in `setup.sh`, before the clone — no

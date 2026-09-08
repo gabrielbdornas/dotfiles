@@ -2,33 +2,6 @@
 # Shared helpers sourced by setup/bootstrap.sh, setup/system.sh, setup/user.sh
 # and setup/sync.sh. Not meant to be run directly.
 
-# Prints "apt", "pacman", or "unsupported" based on /etc/os-release.
-# Deliberately avoids the lsb_release binary - the ID field already answers
-# the same question without an extra dependency, and works the same way
-# whether or not we're inside WSL.
-detect_distro() {
-  # shellcheck disable=SC1091
-  source /etc/os-release
-
-  case "$ID" in
-    arch) echo "pacman" ;;
-    debian|ubuntu) echo "apt" ;;
-    *)
-      case "${ID_LIKE:-}" in
-        *arch*) echo "pacman" ;;
-        *debian*) echo "apt" ;;
-        *) echo "unsupported" ;;
-      esac
-      ;;
-  esac
-}
-
-# WSL is an independent axis from distro - a WSL Ubuntu box is still "apt",
-# a WSL Arch box is still "pacman". This is the one canonical check for it.
-is_wsl() {
-  grep -qi microsoft /proc/version 2>/dev/null
-}
-
 # Deliberately not a general "which desktop environment is this" dispatcher
 # (Pop!_OS/GNOME, WSL, etc.) - the only machine that needs Omarchy-specific
 # dotfiles (Lua-based Hyprland config, not plain .conf) linked is one that
@@ -38,39 +11,27 @@ is_wsl() {
 # one only if/when a second real desktop environment actually needs
 # dotfiles of its own - not preemptively.
 #
-# Omarchy declares itself in /etc/os-release (ID=omarchy) - the same
-# standard mechanism detect_distro() already reads, and Omarchy's own docs
-# point at ~/.config vs. /usr/share/omarchy as the user/vendor split, not
-# an app-data directory under ~/.local/share. Two app-data-directory guesses
-# (OMARCHY_PATH's ~/.local/share/omarchy, then the observed
-# ~/.local/share/Omacom) both turned out to be the wrong kind of signal to
-# check in the first place - an officially declared identity field beats
-# reverse-engineering a directory name.
+# Omarchy declares itself in /etc/os-release (ID=omarchy) - the standard
+# mechanism for exactly this, and Omarchy's own docs point at ~/.config vs.
+# /usr/share/omarchy as the user/vendor split, not an app-data directory
+# under ~/.local/share. Two app-data-directory guesses (OMARCHY_PATH's
+# ~/.local/share/omarchy, then the observed ~/.local/share/Omacom) both
+# turned out to be the wrong kind of signal to check in the first place -
+# an officially declared identity field beats reverse-engineering a
+# directory name. See docs/adr/0017 - this repo only supports Omarchy, so
+# every caller of this function is guaranteed to already be one, but it's
+# kept as the shared, single source of truth for that check rather than
+# assumed implicitly.
 is_omarchy() {
   # shellcheck disable=SC1091
   source /etc/os-release
   [ "$ID" = "omarchy" ]
 }
 
-# Installs packages using whichever package manager detect_distro finds.
-# Callers handle their own per-distro package-name differences before
-# calling this (e.g. gh's Arch package is "github-cli", not "gh").
+# Installs packages via pacman - Omarchy is always Arch-derived, so there's
+# no package-manager branching here. See docs/adr/0017.
 pkg_install() {
-  local mgr
-  mgr="$(detect_distro)"
-
-  case "$mgr" in
-    # DEBIAN_FRONTEND=noninteractive is set via `env`, not a plain
-    # `sudo VAR=val` prefix, since whether sudo passes that through depends
-    # on the machine's sudoers env_keep config - `env` sets it unconditionally
-    # for apt's own process, entirely inside the privileged command sudo runs.
-    apt) sudo env DEBIAN_FRONTEND=noninteractive apt install -y "$@" ;;
-    pacman) sudo pacman -S --needed --noconfirm "$@" ;;
-    *)
-      echo "Unsupported package manager. Only apt and pacman based systems are supported."
-      exit 1
-      ;;
-  esac
+  sudo pacman -S --needed --noconfirm "$@"
 }
 
 # Requests sudo up front (skipping the prompt if credentials are already

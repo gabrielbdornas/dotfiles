@@ -2,7 +2,13 @@
 
 ## Status
 
-Proposed (logged for next session, not fixed yet)
+No longer directly applicable - [0017](0017-omarchy-only-drop-multi-distro-support.md)
+dropped Ubuntu testing entirely, and this ADR's finding was specifically
+about the Ubuntu Docker image. The still-relevant version of this problem
+is [0014](0014-confirmed-systemctl-session-bus-missing-in-containers.md)/[0015](0015-omarchy-confirms-0014-and-symlink-collision-still-untested.md)
+(`systemctl` existing but having no session bus, confirmed on Arch/Omarchy)
+- that's the one to actually fix. Kept here as the historical record of the
+first symptom found.
 
 ## Context
 
