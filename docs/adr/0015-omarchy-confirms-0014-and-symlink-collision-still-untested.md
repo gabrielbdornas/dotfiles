@@ -25,7 +25,7 @@ specific to plain Arch vs. Omarchy's image. No new information there,
 What's worth logging separately: the "Linking example dotfiles" step
 succeeded with **no** backup/warning output, even though
 `dotfiles-omarchy-test` seeds `~/.config/hypr` with Omarchy's real default
-config before `setup.sh` ever runs (see `docker/omarchy-test.Dockerfile`).
+config before `setup.sh` ever runs (see `docker/omarchy_test.Dockerfile`).
 This is expected, not a bug - flagged in that Dockerfile's own comment
 already: Omarchy's real hypr config is Lua-based (`bindings.lua`,
 `input.lua`, ...), so it doesn't share exact filenames with
@@ -47,7 +47,7 @@ Actually exercise the collision path, either:
   uses (none currently match - `bindings.lua`/`input.lua`/etc. under
   `default/hypr`, not `.conf` files), so a real collision occurs naturally
   when `setup.sh` runs against the seeded image, or
-- Have `docker/omarchy-test.Dockerfile` additionally pre-create a file at
+- Have `docker/omarchy_test.Dockerfile` additionally pre-create a file at
   the exact path `config/hypr/keybindings.conf` or `monitors.conf` targets
   (`~/.config/hypr/keybindings.conf`), with content that deliberately
   differs from the repo's version, purpose-built to force the collision

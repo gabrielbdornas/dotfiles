@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed (logged for next session, not fixed yet - extends [0013](0013-guard-missing-systemctl-in-user-sh.md))
+Accepted (implemented in `setup/user.sh` - extends [0013](0013-guard-missing-systemctl-in-user-sh.md))
 
 ## Context
 
@@ -33,7 +33,7 @@ This is exactly the failure mode 0013 already flagged as an open question
 but no user session available' case") - now confirmed happening for real,
 not hypothetical.
 
-## Decision (for next session)
+## Decision
 
 `user.sh`'s systemd guard needs to check both conditions, not just the
 binary's existence:
@@ -64,3 +64,15 @@ specific "$DBUS_SESSION_BUS_ADDRESS...not defined" error text.
   both, not just the one first observed.
 - Everything before this step remains proven working on Arch now too,
   same as 0013 noted for Ubuntu - this is the last step in the chain.
+
+> **Update:** implemented exactly as proposed above, in `setup/user.sh`'s
+> final step - not yet re-verified against a live container run (this
+> session's sandbox has no Docker socket access), so still worth confirming
+> for real via `docker/README.md`'s quick-iteration flow: it should now
+> print `-----> No usable systemd user session - skipping login-sync
+> service install (expected in containers/minimal environments)` and exit
+> 0, instead of failing on the `Failed to connect to user scope bus...`
+> error. [0013](0013-guard-missing-systemctl-in-user-sh.md)'s own guard was
+> never separately implemented - this single check supersedes it, since it
+> already covers both failure modes (binary missing, and binary present
+> but no session).

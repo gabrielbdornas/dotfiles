@@ -66,7 +66,7 @@ else
 fi
 ```
 
-`docker/omarchy-test.Dockerfile` now overwrites `/etc/os-release` with a
+`docker/omarchy_test.Dockerfile` now overwrites `/etc/os-release` with a
 real Omarchy machine's actual content (`archlinux:latest` reports plain
 `ID=arch` by default), so the Docker test actually exercises this branch
 instead of silently taking the `else` path.

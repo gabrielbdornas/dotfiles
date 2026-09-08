@@ -20,7 +20,7 @@ consequences (including what it deliberately leaves out). See the root
 | [0011](0011-strip-repo-before-third-party-installers.md) | Strip `REPO` before invoking third-party installers (Oh My Zsh reads the same name) |
 | [0012](0012-authenticate-before-cloning-into-code-dir.md) | Authenticate gh via Infisical before cloning; install into `~/code/$GITHUB_USERNAME/dotfiles` |
 | [0013](0013-guard-missing-systemctl-in-user-sh.md) | ~~Guard `user.sh`'s systemd step for `systemctl` not existing at all~~ Ubuntu-specific, no longer applicable - see 0014/0015 |
-| [0014](0014-confirmed-systemctl-session-bus-missing-in-containers.md) | (Proposed) Confirmed on Arch: `systemctl` can exist but have no user session bus |
+| [0014](0014-confirmed-systemctl-session-bus-missing-in-containers.md) | `systemctl` can exist but have no user session bus - guard `user.sh`'s systemd step for both |
 | [0015](0015-omarchy-confirms-0014-and-symlink-collision-still-untested.md) | (Proposed) Omarchy confirms 0014; the symlink collision path (0006) is still untested |
 | [0016](0016-omarchy-only-not-a-desktop-dispatcher.md) | Gate Omarchy dotfiles with `is_omarchy()`, not a general desktop dispatcher |
 | [0017](0017-omarchy-only-drop-multi-distro-support.md) | Drop multi-distro (apt) support entirely, require Omarchy specifically |

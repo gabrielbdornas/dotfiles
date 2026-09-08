@@ -1,6 +1,6 @@
 # Testing via Docker
 
-`omarchy-test.Dockerfile` validates `setup/` end to end without touching a
+`omarchy_test.Dockerfile` validates `setup/` end to end without touching a
 real machine. This repo only supports Omarchy (see
 [`docs/adr/0017`](../docs/adr/0017-omarchy-only-drop-multi-distro-support.md)) -
 there used to be separate Ubuntu and plain-Arch images here too, dropped
@@ -74,11 +74,12 @@ pre-existing `~/.config/hypr` content.
 
 ## Known limitations in this container
 
-- **systemd user service**: `user.sh`'s systemd install step needs a
-  working `systemctl --user` session, which this container doesn't have -
-  tracked as
-  [`docs/adr/0014`](../docs/adr/0014-confirmed-systemctl-session-bus-missing-in-containers.md)/[`0015`](../docs/adr/0015-omarchy-confirms-0014-and-symlink-collision-still-untested.md)
-  (not yet fixed).
+- **systemd user service**: this container has no working `systemctl --user`
+  session, so `user.sh`'s systemd install step now detects that
+  ([`docs/adr/0014`](../docs/adr/0014-confirmed-systemctl-session-bus-missing-in-containers.md))
+  and skips the service install instead of failing - the login-sync path
+  itself is still untested here as a result, only the graceful-skip
+  behavior is.
 - **`gh ssh-key add`**: needs the `GH_TOKEN` secret's PAT to actually carry
   SSH-key-management permission - a token missing it will fail here with a
   permission error, not earlier.

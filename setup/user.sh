@@ -63,11 +63,21 @@ fi
 # is now where this repo itself lives) all happen in setup.sh instead, before
 # the clone - see docs/adr/0012.
 
-# Login-time sync service (async, non-blocking - see setup/sync.sh)
-echo "===> Installing dotfiles-sync systemd unit..."
-mkdir -p "$HOME/.config/systemd/user"
-link_dotfile "$REPO_ROOT/setup/systemd/dotfiles-sync.service" "$HOME/.config/systemd/user/dotfiles-sync.service"
-systemctl --user daemon-reload
-systemctl --user enable --now dotfiles-sync.service
+# Login-time sync service (async, non-blocking - see setup/sync.sh).
+# `systemctl --user status` is a cheap probe for a *usable* user session,
+# not just the binary existing - `systemctl` is always present on Arch (it's
+# part of the base system, not opt-in like on minimal Debian/Ubuntu images),
+# but a container/session-less environment has no D-Bus user bus for it to
+# reach, and `--user status` fails cleanly in exactly that case. See
+# docs/adr/0014.
+if command -v systemctl >/dev/null 2>&1 && systemctl --user status >/dev/null 2>&1; then
+  echo "===> Installing dotfiles-sync systemd unit..."
+  mkdir -p "$HOME/.config/systemd/user"
+  link_dotfile "$REPO_ROOT/setup/systemd/dotfiles-sync.service" "$HOME/.config/systemd/user/dotfiles-sync.service"
+  systemctl --user daemon-reload
+  systemctl --user enable --now dotfiles-sync.service
+else
+  echo "-----> No usable systemd user session - skipping login-sync service install (expected in containers/minimal environments)"
+fi
 
 echo "===> User setup complete"

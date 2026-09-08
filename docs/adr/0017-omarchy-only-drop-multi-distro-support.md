@@ -39,7 +39,7 @@ Decided via explicit tradeoff discussion, not assumed:
   stricter stance than "Omarchy dotfiles are an extra gated step," which
   is what [0016](0016-omarchy-only-not-a-desktop-dispatcher.md) alone
   would have left in place.
-- **Docker tests consolidate to `omarchy-test.Dockerfile` only.**
+- **Docker tests consolidate to `omarchy_test.Dockerfile` only.**
 
 ## Decision
 
@@ -77,7 +77,7 @@ Docker "quick iteration" testing flow always has too.
    `.pkg.tar.zst`-via-GitHub-releases logic, which was always
    Arch-specific and unrelated to this cleanup.
 4. `docker/ubuntu-test.Dockerfile` and `docker/arch-test.Dockerfile` are
-   deleted. `docker/omarchy-test.Dockerfile` needed no changes - it already
+   deleted. `docker/omarchy_test.Dockerfile` needed no changes - it already
    overwrote `/etc/os-release` with `ID=omarchy` and never preinstalled
    `git`, so it already satisfied the stricter requirement.
 
