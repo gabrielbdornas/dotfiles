@@ -48,10 +48,16 @@ install_plugin "zsh-users/zsh-syntax-highlighting"
 
 # Example dotfiles - the concrete proof that clone -> bootstrap -> system ->
 # user -> link_dotfile works end to end. Full old_process/ content migration
-# happens later, file by file, reusing link_dotfile.
-echo "===> Linking example dotfiles..."
-link_dotfile "$REPO_ROOT/config/hypr/keybindings.conf" "$HOME/.config/hypr/keybindings.conf"
-link_dotfile "$REPO_ROOT/config/hypr/monitors.conf" "$HOME/.config/hypr/monitors.conf"
+# happens later, file by file, reusing link_dotfile. Gated on is_omarchy()
+# so this doesn't clutter ~/.config/hypr on a machine that isn't running
+# Omarchy at all (Pop!_OS, WSL) - see docs/adr/0016.
+if is_omarchy; then
+  echo "===> Linking example dotfiles..."
+  link_dotfile "$REPO_ROOT/config/hypr/keybindings.conf" "$HOME/.config/hypr/keybindings.conf"
+  link_dotfile "$REPO_ROOT/config/hypr/monitors.conf" "$HOME/.config/hypr/monitors.conf"
+else
+  echo "-----> Not an Omarchy machine - skipping Omarchy-specific dotfiles"
+fi
 
 # GitHub auth, the SSH key, and the ~/code/$GITHUB_USERNAME workspace (which
 # is now where this repo itself lives) all happen in setup.sh instead, before

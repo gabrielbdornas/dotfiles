@@ -29,6 +29,29 @@ is_wsl() {
   grep -qi microsoft /proc/version 2>/dev/null
 }
 
+# Deliberately not a general "which desktop environment is this" dispatcher
+# (Pop!_OS/GNOME, WSL, etc.) - the only machine that needs Omarchy-specific
+# dotfiles (Lua-based Hyprland config, not plain .conf) linked is one that
+# actually runs Omarchy. Everywhere else should just get the shared
+# shell/tooling layer and nothing desktop-specific, which is already the
+# correct behavior with no extra logic needed. Add more checks like this
+# one only if/when a second real desktop environment actually needs
+# dotfiles of its own - not preemptively.
+#
+# Omarchy declares itself in /etc/os-release (ID=omarchy) - the same
+# standard mechanism detect_distro() already reads, and Omarchy's own docs
+# point at ~/.config vs. /usr/share/omarchy as the user/vendor split, not
+# an app-data directory under ~/.local/share. Two app-data-directory guesses
+# (OMARCHY_PATH's ~/.local/share/omarchy, then the observed
+# ~/.local/share/Omacom) both turned out to be the wrong kind of signal to
+# check in the first place - an officially declared identity field beats
+# reverse-engineering a directory name.
+is_omarchy() {
+  # shellcheck disable=SC1091
+  source /etc/os-release
+  [ "$ID" = "omarchy" ]
+}
+
 # Installs packages using whichever package manager detect_distro finds.
 # Callers handle their own per-distro package-name differences before
 # calling this (e.g. gh's Arch package is "github-cli", not "gh").

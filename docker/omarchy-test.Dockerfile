@@ -27,6 +27,27 @@ RUN useradd -m -s /bin/bash tester && \
     echo "tester ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/tester && \
     chmod 0440 /etc/sudoers.d/tester
 
+# setup/lib.sh's is_omarchy() checks /etc/os-release for ID=omarchy (the
+# standard mechanism, and what Omarchy actually declares itself as on a
+# real machine - see docs/adr/0016) - archlinux:latest reports plain
+# ID=arch by default, so this overwrites it with a real Omarchy machine's
+# actual /etc/os-release content (confirmed by hand) to make the
+# approximation trigger real detection instead of faking a directory.
+RUN cat <<'EOF' > /etc/os-release
+NAME="Omarchy"
+PRETTY_NAME="Omarchy"
+ID=omarchy
+ID_LIKE=arch
+BUILD_ID="4.0.2"
+VERSION_ID="4.0.2"
+ANSI_COLOR="38;2;158;206;106"
+HOME_URL="https://omarchy.org/"
+DOCUMENTATION_URL="https://learn.omacom.io/2/the-omarchy-manual"
+SUPPORT_URL="https://discord.gg/tXFUdasqhY"
+BUG_REPORT_URL="https://github.com/basecamp/omarchy/issues"
+LOGO=omarchy
+EOF
+
 RUN mkdir -p /home/tester/.config/hypr && \
     curl -fsSL https://github.com/omacom/omarchy/archive/refs/heads/quattro.tar.gz \
       | tar -xz -C /home/tester/.config/hypr --strip-components=3 omarchy-quattro/default/hypr && \
