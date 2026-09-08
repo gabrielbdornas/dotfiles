@@ -66,13 +66,13 @@ specific "$DBUS_SESSION_BUS_ADDRESS...not defined" error text.
   same as 0013 noted for Ubuntu - this is the last step in the chain.
 
 > **Update:** implemented exactly as proposed above, in `setup/user.sh`'s
-> final step - not yet re-verified against a live container run (this
-> session's sandbox has no Docker socket access), so still worth confirming
-> for real via `docker/README.md`'s quick-iteration flow: it should now
-> print `-----> No usable systemd user session - skipping login-sync
-> service install (expected in containers/minimal environments)` and exit
-> 0, instead of failing on the `Failed to connect to user scope bus...`
-> error. [0013](0013-guard-missing-systemctl-in-user-sh.md)'s own guard was
-> never separately implemented - this single check supersedes it, since it
+> final step, and confirmed against a real `docker/omarchy_test.Dockerfile`
+> run (both the full `setup.sh` one-liner and a same-container rerun): the
+> log now ends with `-----> No usable systemd user session - skipping
+> login-sync service install (expected in containers/minimal environments)`
+> followed by `===> User setup complete`, exit 0 - the first time the full
+> script has completed end to end without failing on this step.
+> [0013](0013-guard-missing-systemctl-in-user-sh.md)'s own guard was never
+> separately implemented - this single check supersedes it, since it
 > already covers both failure modes (binary missing, and binary present
 > but no session).
