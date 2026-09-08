@@ -87,7 +87,7 @@ if ! gh auth status >/dev/null 2>&1; then
     exit 1
   fi
   echo "===> Authenticating GitHub CLI..."
-  echo "$GH_TOKEN" | gh auth login --with-token
+  echo "$GH_TOKEN" | gh auth login --with-token --git-protocol ssh
 else
   echo "-----> GitHub CLI already authenticated"
 fi
