@@ -55,6 +55,11 @@ Worth deciding at the same time whether this should also detect the
 `systemctl --user status >/dev/null 2>&1` before enabling) rather than just
 the binary's existence, since that's the other known way this step can fail.
 
+> **Update ([0014](0014-confirmed-systemctl-session-bus-missing-in-containers.md)):**
+> confirmed for real on the Arch Docker test - `systemctl` exists there
+> (unlike Ubuntu's minimal image), so this ADR's binary-only guard would
+> NOT have caught it. The actual fix needs both checks combined; see 0014.
+
 ## Consequences
 
 - Until fixed, `user.sh` (and therefore the whole `setup.sh` chain) cannot

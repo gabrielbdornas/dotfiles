@@ -70,9 +70,10 @@ git push
 
 ## Testing on another distro
 
-Day-to-day development happens on Arch, so the apt branch of `setup/` is
-otherwise unverified. See [`docker/README.md`](docker/README.md) for
-testing it against a real Ubuntu container.
+Three Docker images validate `setup/` end to end: Ubuntu (apt branch),
+Arch (pacman branch), and Omarchy (pacman branch, plus the dotfile-symlink
+collision-safety path against Omarchy's real config layout). See
+[`docker/README.md`](docker/README.md) for how to build and run them.
 
 ## Layout
 
@@ -86,7 +87,7 @@ setup/lib.sh             shared helpers (distro/WSL detection, symlink helper, .
 setup/sync.sh            pull + re-apply, run by the systemd unit
 config/hypr/             example dotfiles proving the symlink pattern
 docs/adr/                why things are built this way
-docker/                  Ubuntu container for testing the apt branch
+docker/                  Ubuntu/Arch/Omarchy containers for testing setup/
 old_process/             previous approach, kept as reference
 ```
 
