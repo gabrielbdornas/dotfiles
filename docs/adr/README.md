@@ -25,4 +25,5 @@ consequences (including what it deliberately leaves out). See the root
 | [0016](0016-omarchy-only-not-a-desktop-dispatcher.md) | Gate Omarchy dotfiles with `is_omarchy()`, not a general desktop dispatcher |
 | [0017](0017-omarchy-only-drop-multi-distro-support.md) | Drop multi-distro (apt) support entirely, require Omarchy specifically |
 | [0018](0018-use-uname-n-not-hostname-for-key-naming.md) | Use `uname -n`, not `hostname`, for SSH key naming - `hostname` isn't installed on Omarchy |
-| [0019](0019-omarchy-config-sync-strategy-deferred.md) | (Proposed, deferred) Omarchy config sync strategy - two plugin alternatives found, decision pending source review |
+| [0019](0019-omarchy-config-sync-strategy-deferred.md) | ~~Omarchy config sync strategy - two plugin alternatives found, decision pending source review~~ Superseded by 0020 |
+| [0020](0020-adopt-ress-for-backup-and-sync.md) | Adopt `ress`'s code (copied in, not forked) for backup/restore/sync; adds a new live-symlink mode |

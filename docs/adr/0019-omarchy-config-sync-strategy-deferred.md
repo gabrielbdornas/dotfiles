@@ -2,8 +2,10 @@
 
 ## Status
 
-Proposed (deferred - discussion logged, decision pending source review of
-both plugins named below; picking this back up is a future session)
+Superseded by [0020](0020-adopt-ress-for-backup-and-sync.md) - a third
+project (`ress`) answered a bigger version of this question than either
+plugin below, and was adopted instead. Kept here as the historical record of
+the two plugins considered first and why neither was picked.
 
 ## Context
 

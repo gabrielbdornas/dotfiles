@@ -10,6 +10,12 @@ rationale for *why* things are built this way lives in
 [`docs/adr/`](docs/adr/README.md), not here — this file is just how to use
 the repo.
 
+`ress/` is a work-in-progress backup/restore/sync layer built on the code of
+[btsouth/omarchy-resurrect](https://github.com/btsouth/omarchy-resurrect)
+("ress"), copied in (MIT-licensed) rather than tracked as a fork, with new
+capabilities layered on top — see `ress/README.md` and `docs/adr/` for the
+decision and its current status.
+
 ## Setup a new machine
 
 ```bash
