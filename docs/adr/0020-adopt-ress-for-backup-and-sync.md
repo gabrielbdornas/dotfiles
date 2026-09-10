@@ -2,9 +2,10 @@
 
 ## Status
 
-Accepted. Live-symlink mode implemented and tested on
-`feat/ress-backup-sync`; the Infisical/gh/SSH bootstrap port described below
-is not yet done.
+Accepted. Live-symlink mode implemented and verified in the sandboxed test
+harness on `feat/ress-backup-sync`; real-machine verification is in progress
+(see "Handoff: real-VM verification" below). The Infisical/gh/SSH bootstrap
+port described below is not yet done.
 
 ## Context
 
@@ -122,3 +123,86 @@ is tested today.
   maintenance cost accepted in exchange for not re-deriving package-manifest
   tracking, plugin-pinning, encrypted secrets, resumable restore, and
   adversarial-input hardening from scratch.
+
+## Handoff: real-VM verification (in progress, resume here)
+
+The sandboxed test harness (`ress/tests/run.sh`, fake `pacman`/`git`/etc. on
+`PATH`) proves the logic is correct in isolation, but nothing yet confirms
+the live-symlink mode behaves the same way against a real Omarchy install -
+real `pacman`, a real `~/.config`, real file-manager/editor behavior around
+the symlink. A VirtualBox Omarchy VM was created for exactly this, and the
+session ended before running the test. **Nothing has been executed on the VM
+yet** - the steps below are the plan, not a result.
+
+### Getting the code onto the VM
+
+`ress/` is the only directory needed for this test - either clone the repo
+and checkout `feat/ress-backup-sync`, or copy just `ress/` over via a
+VirtualBox shared folder / `scp`.
+
+### Test steps (none run yet)
+
+```bash
+# 1. Install as a plugin (ress's own documented dev workflow - no
+#    `omarchy plugin add`/separate repo needed for this).
+mkdir -p ~/.config/omarchy/plugins/gabrielbdornas.ress
+rsync -a --exclude '.git/' /path/to/ress/ ~/.config/omarchy/plugins/gabrielbdornas.ress/
+~/.config/omarchy/plugins/gabrielbdornas.ress/bin/ress link   # puts `ress` on PATH
+
+# 2. Confirm dependencies (git/rsync/jq/pacman are stock on Omarchy; age/yay
+#    failing here is fine and unrelated to this test).
+ress doctor
+
+# 3. Create the vault.
+ress init
+
+# 4. Set up the symlink test.
+mkdir -p ~/.claude
+echo '{"model":"test"}' > ~/.claude/settings.json
+mkdir -p ~/.config/ress
+echo '.claude' > ~/.config/ress/symlink
+
+# 5. Back up and confirm the link was made.
+ress backup -m "test symlink mode"
+ls -la ~/.claude          # should now be a symlink
+readlink -f ~/.claude     # should resolve into .../ress/vault/home/.claude
+
+# 6. Confirm live-sync: an edit through the link needs no second backup.
+echo 'edited live' > ~/.claude/note.txt
+cat ~/.local/share/ress/vault/home/.claude/note.txt   # should already show it
+
+# 7. Restore recreates the link. IMPORTANT: `~/.claude` is now a symlink -
+#    `rm -f` removes just the link; `rm -rf ~/.claude/` (trailing slash)
+#    would delete through it into the vault. Use `rm -f`.
+rm -f ~/.claude
+ress restore --only config --yes
+ls -la ~/.claude          # symlink again, content intact
+
+# 8. Divergence-safety: a real (non-symlinked) dir reappearing with
+#    different content must be backed up, never silently discarded.
+rm -f ~/.claude
+mkdir -p ~/.claude
+echo '{"model":"diverged"}' > ~/.claude/settings.json
+ress restore --only config --restart --yes
+ls ~/.claude.ress-bak/settings.json   # the diverged copy, preserved
+cat ~/.claude/settings.json           # vault's version won
+```
+
+### What to check when resuming
+
+- Does every step above behave as written, especially step 5 (the symlink
+  actually being made) and step 8 (the backup-suffix directory actually
+  appearing rather than data loss)?
+- Anything real-`pacman`/real-filesystem-specific that the sandboxed harness
+  couldn't have caught (permissions, SELinux/AppArmor-style restrictions,
+  an editor or file manager that doesn't follow the symlink the way a
+  shell `cat`/`echo` does)?
+- Once this passes: `ress doctor`'s output on top of a real Omarchy install
+  (not just the sandbox's stubbed `tests/bin/*`) is also worth a look before
+  moving on to the bootstrap port, since that port leans on `ress doctor`
+  for its own new checks.
+- Only after real-VM verification holds up should work resume on the
+  Infisical/gh/SSH `cmd_bootstrap` port (the "not yet done" piece above) -
+  per the original sequencing decision, that higher-blast-radius work
+  deliberately waits until the new capability that came before it is
+  actually proven, not just unit-tested.
